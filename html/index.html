@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>pasokusa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body>
+  <div class="container mx-auto mt-5">
+    <p class="text-2xl">pasokusa</p>
+  <div>
+    <button type="button" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2" onclick="useReader()">
+        カードリーダーを接続
+      </button>
+    <button type="button" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2" onclick="invokeMain()">
+      読み込む
+    </button>
+    <p id="idm">カードの IDm: 取得中</p>
+  </div>
+  
+
+<label for="message" class="block mb-2 text-sm font-medium text-gray-900">デバッグ ログ</label>
+<textarea id="output" rows="20" class="block p-2.5 w-full font-mono text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" readonly placeholder="PaSoRi のログがここに表示されます..."></textarea>
+</div>
+  <script type='text/javascript'>
+    var loaded = false;
+    var usbReady = false;
+
+    async function useReader() {
+        try {
+            await navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
+        } catch {
+            var element = document.getElementById('output');
+            element.value += "No available NFC reader found."
+        }
+        usbReady = true;
+    }
+
+    function invokeMain() {
+        if (usbReady) {
+            Module._main();
+        } else {
+            var element = document.getElementById('output');
+            element.value += "NFC card reader is not ready.\n"
+        }
+    }
+
+    var Module = {
+      preRun: (function () {
+        loaded = false;
+      }),
+      postRun: (function () {
+        loaded = false;
+      }),
+      print: (function () {
+        var element = document.getElementById('output');
+        if (element) element.value = ''; // clear browser cache
+        return function (text) {
+          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+          // These replacements are necessary if you render to raw HTML
+          //text = text.replace(/&/g, "&amp;");
+          //text = text.replace(/</g, "&lt;");
+          //text = text.replace(/>/g, "&gt;");
+          //text = text.replace('\n', '<br>', 'g');
+        //   console.log(text);
+
+          if (element) {
+            element.value += text + "\n";
+            element.scrollTop = element.scrollHeight; // focus on bottom
+          }
+
+            // Get IDm
+            if (typeof text === "string") {
+                if (text.match(/^(?=.*card IDm).*$/)) {
+                    if (!loaded) {
+                        document.getElementById("idm").innerHTML = "カードの IDm: " + text.replace("# card IDm = ", "");
+                        loaded = true;
+                    }
+                }
+            } else {
+                element.value += "Nothing was returned from the reader."
+            }
+        }
+      })(),
+      printErr: function (text) {
+        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
+        if (0) { // XXX disabled for safety typeof dump == 'function') {
+          dump(text + '\n'); // fast, straight to the real console
+        } else {
+          console.error(text);
+        }
+      },
+      setStatus: function (text) {
+        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
+        if (text === Module.setStatus.text) return;
+        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
+        var now = Date.now();
+        if (m && now - Date.now() < 30) return; // if this is a progress update, skip it if too soon
+        if (m) {
+          text = m[1];
+        }
+      },
+      totalDependencies: 0,
+      monitorRunDependencies: function (left) {
+        this.totalDependencies = Math.max(this.totalDependencies, left);
+        Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
+      },
+      noInitialRun: true
+    };
+    Module.setStatus('Downloading...');
+    window.onerror = function (event) {
+      // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
+      Module.setStatus('Exception thrown, see JavaScript console');
+      Module.setStatus = function (text) {
+        if (text) Module.printErr('[post-exception status] ' + text);
+      };
+    };
+  </script>
+  <script async type="text/javascript" src="pasori.js"></script>
+</body>
+
+</html>
