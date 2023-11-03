@@ -1,0 +1,13 @@
+services:
+  app:
+    image: ghcr.io/yude/wave2attend:master
+    build:
+      context: app
+      dockerfile: ./Dockerfile
+    restart: always
+    environment:
+      TZ: "Asia/Tokyo"
+    volumes:
+      - type: bind
+        source: ./data
+        target: /app/data

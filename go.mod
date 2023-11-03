@@ -1,4 +1,4 @@
-module github.com/yude/pasokusa
+module github.com/yude/wave2attend
 
 go 1.21.3
 

@@ -20,7 +20,7 @@ type Member struct {
 func InitDB() {
 	// gorm; ORM for Go
 	var err error
-	DB, err = gorm.Open(sqlite.Open("data.db"), &gorm.Config{})
+	DB, err = gorm.Open(sqlite.Open("data/data.db"), &gorm.Config{})
 	if err != nil {
 		panic("Failed to connect to database")
 	}
