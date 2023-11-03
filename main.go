@@ -1,12 +1,8 @@
 package main
 
-import (
-	"github.com/labstack/echo/v4"
-)
-
 func main() {
-	e := echo.New()
-	e.Static("/", "html")
+	InitDB()
+	InitApp()
 
-	e.Logger.Fatal(e.Start(":8080"))
+	App.Listen(":8080")
 }

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en-us">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>pasokusa</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.0.0/flowbite.min.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="container mx-auto mt-5 max-w-md">
+    <p class="text-2xl text-center">名前を変える</p>
+    <!-- <a href="/"> -->
+      <button type="button" onClick="setNames()" class="brightness-60 drop-shadow-md w-full block text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+        確定する
+      </button>
+    <!-- </a> -->
+    <div class="relative overflow-x-auto mt-5">
+        <table class="w-full text-sm text-left">
+            <thead class="bg-gray-50">
+                <tr>
+                    <th scope="col" class="px-6 py-3">
+                        IDm
+                    </th>
+                    <th scope="col" class="px-6 py-3">
+                        名前
+                    </th>
+                </tr>
+            </thead>
+            <tbody id="members"></tbody>
+        </table>
+      </div>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.0.0/flowbite.min.js"></script>
+  <script type='text/javascript'>
+    var loaded = false;
+    var usbReady = false;
+
+    getMembers();
+
+    function getMembers() {
+      const url = "/api/members";
+      const memberArea = document.getElementById("members");
+
+      fetch(url)
+        .then(res => res.json())
+        .then(data => {
+          console.log(data.result)
+          data.result.forEach((member, memberIdx) => {
+            const tr = document.createElement("tr");
+            tr.classList.add("border-b");
+            tr.id = memberIdx
+            memberArea.appendChild(tr);
+
+            const objArray = Object.entries(member);
+            objArray.forEach((arr, idx) => {
+                if (idx >= 0 && idx <= 1) {
+                    const td = document.createElement("td");
+                    td.classList.add("px-6");
+                    if (idx == 0) {
+                      td.classList.add("idm");
+                    }
+                    td.classList.add("py-4");
+
+                    if (idx == 1) {
+                      let name = "未設定"
+                      if (arr[1] != "") {
+                        name = arr[1]
+                      }
+                      td.innerHTML = "<input class=\"name bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5\" type=\"text\" placeholder=\"" + name + "\"></textarea>"
+                    } else {
+                      td.textContent = arr[1]
+                    }
+                    tr.appendChild(td);
+                }
+            })
+          })
+        })
+    }
+
+    function setNames() {
+      let nameAreas = document.getElementsByClassName("name");
+      let nameAreasArr = Array.from(nameAreas);
+
+      nameAreasArr.forEach((elm, idx) => {
+        if (elm.value != "") {
+          let tr = document.getElementById(idx)
+          let td = tr.getElementsByTagName("td")
+
+          console.log("elmvalue " + elm.value)
+          fetch("/api/update-name?idm=" + td[0].innerHTML + "&name=" + elm.value)
+            .then((res) => res.json())
+            .then((data) => console.log(data))
+        }
+      })
+
+      window.location.href = "/";
+    }
+</script>
+</div>
+</body>
+</html>

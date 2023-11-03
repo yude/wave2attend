@@ -5,122 +5,86 @@
   <meta charset="utf-8">
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>pasokusa</title>
+  <title>ざいせき</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.0.0/flowbite.min.css" rel="stylesheet" />
 </head>
 
 <body>
-  <div class="container mx-auto mt-5">
-    <p class="text-2xl">pasokusa</p>
-  <div>
-    <button type="button" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2" onclick="useReader()">
-        カードリーダーを接続
+  <div class="container mx-auto mt-5 max-w-md">
+    <p class="text-4xl text-center skew-y-12 m-10">ざいせき</p>
+
+  <div class="grid grid-cols-2 gap-4">
+    <div>
+      <button type="button" class="drop-shadow-md text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-4xl px-5 py-10 text-center mr-2 mb-2 w-full" onclick="targetStatus='in'; invokeMain()">
+        在室
       </button>
-    <button type="button" class="text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2" onclick="invokeMain()">
-      読み込む
-    </button>
-    <p id="idm">カードの IDm: 取得中</p>
+    </div>
+    <div>
+      <button type="button" class="drop-shadow-md text-white bg-gradient-to-br from-pink-500 to-orange-400 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-pink-200 dark:focus:ring-pink-800 font-medium rounded-lg text-4xl px-5 py-10 text-center mr-2 mb-2 w-full" onclick="targetStatus='out'; invokeMain()">
+        外出
+      </button>
+    </div>
   </div>
-  
 
-<label for="message" class="block mb-2 text-sm font-medium text-gray-900">デバッグ ログ</label>
-<textarea id="output" rows="20" class="block p-2.5 w-full font-mono text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" readonly placeholder="PaSoRi のログがここに表示されます..."></textarea>
+  <hr class="mt-5 mb-5"></hr>
+
+<div class="relative overflow-x-auto">
+  <table class="w-full text-sm text-left">
+      <thead class="uppercase bg-gray-50">
+          <tr>
+              <th scope="col" class="px-6 py-3">
+                  名前
+              </th>
+              <th scope="col" class="px-6 py-3">
+                  状態
+              </th>
+          </tr>
+      </thead>
+      <tbody id="members"></tbody>
+  </table>
 </div>
-  <script type='text/javascript'>
-    var loaded = false;
-    var usbReady = false;
 
-    async function useReader() {
-        try {
-            await navigator.usb.requestDevice({ filters: [{ vendorId: 0x054c }] })
-        } catch {
-            var element = document.getElementById('output');
-            element.value += "No available NFC reader found."
-        }
-        usbReady = true;
-    }
+<div class="grid mt-5">
+  <a href="/change-name">
+    <button type="button" class="brightness-60 drop-shadow-md w-full block text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2">
+      名前を変える
+    </button>
+  </a>
+  <button type="button" class="brightness-60 drop-shadow-md w-full block text-white bg-gradient-to-br from-green-400 to-blue-600 hover:bg-gradient-to-bl focus:ring-4 focus:outline-none focus:ring-green-200 dark:focus:ring-green-800 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2" onclick="useReader()">
+    カードリーダーを接続する
+  </button>
+</div>
 
-    function invokeMain() {
-        if (usbReady) {
-            Module._main();
-        } else {
-            var element = document.getElementById('output');
-            element.value += "NFC card reader is not ready.\n"
-        }
-    }
 
-    var Module = {
-      preRun: (function () {
-        loaded = false;
-      }),
-      postRun: (function () {
-        loaded = false;
-      }),
-      print: (function () {
-        var element = document.getElementById('output');
-        if (element) element.value = ''; // clear browser cache
-        return function (text) {
-          if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-          // These replacements are necessary if you render to raw HTML
-          //text = text.replace(/&/g, "&amp;");
-          //text = text.replace(/</g, "&lt;");
-          //text = text.replace(/>/g, "&gt;");
-          //text = text.replace('\n', '<br>', 'g');
-        //   console.log(text);
+<div id="accordion-flush" data-accordion="collapse" data-active-classes="bg-white text-gray-900" data-inactive-classes="text-gray-500">
+  <h2 id="accordion-flush-heading-1">
+    <button type="button" class="flex items-center justify-between w-full py-5 font-medium text-left text-gray-500" data-accordion-target="#accordion-flush-body-1" aria-expanded="false" aria-controls="accordion-flush-body-1">
+      <span>デバッグ情報</span>
+      <svg data-accordion-icon class="w-3 h-3 shrink-0" aria-hidden="false" xmlns="http://www.w3.org/2000/svg" height="1em" viewBox="0 0 384 512"><!--! Font Awesome Free 6.4.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license (Commercial License) Copyright 2023 Fonticons, Inc. --><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M169.4 470.6c12.5 12.5 32.8 12.5 45.3 0l160-160c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L224 370.8 224 64c0-17.7-14.3-32-32-32s-32 14.3-32 32l0 306.7L54.6 265.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l160 160z"/></svg>
+    </button>
+  </h2>
+  <div id="accordion-flush-body-1" class="hidden" aria-labelledby="accordion-flush-heading-1">
+    <div class="py-5">
+      <p id="idm">カードの IDm: 取得中</p>
 
-          if (element) {
-            element.value += text + "\n";
-            element.scrollTop = element.scrollHeight; // focus on bottom
-          }
+      <label for="message" class="block mb-2 text-sm font-medium text-gray-900">デバッグ ログ</label>
+      <textarea id="output" rows="20" class="block p-2.5 w-full font-mono text-sm text-gray-900 bg-gray-50 rounded-lg" readonly placeholder="PaSoRi のログがここに表示されます..."></textarea>
+    </div>
+  </div>
+</div>
 
-            // Get IDm
-            if (typeof text === "string") {
-                if (text.match(/^(?=.*card IDm).*$/)) {
-                    if (!loaded) {
-                        document.getElementById("idm").innerHTML = "カードの IDm: " + text.replace("# card IDm = ", "");
-                        loaded = true;
-                    }
-                }
-            } else {
-                element.value += "Nothing was returned from the reader."
-            }
-        }
-      })(),
-      printErr: function (text) {
-        if (arguments.length > 1) text = Array.prototype.slice.call(arguments).join(' ');
-        if (0) { // XXX disabled for safety typeof dump == 'function') {
-          dump(text + '\n'); // fast, straight to the real console
-        } else {
-          console.error(text);
-        }
-      },
-      setStatus: function (text) {
-        if (!Module.setStatus.last) Module.setStatus.last = { time: Date.now(), text: '' };
-        if (text === Module.setStatus.text) return;
-        var m = text.match(/([^(]+)\((\d+(\.\d+)?)\/(\d+)\)/);
-        var now = Date.now();
-        if (m && now - Date.now() < 30) return; // if this is a progress update, skip it if too soon
-        if (m) {
-          text = m[1];
-        }
-      },
-      totalDependencies: 0,
-      monitorRunDependencies: function (left) {
-        this.totalDependencies = Math.max(this.totalDependencies, left);
-        Module.setStatus(left ? 'Preparing... (' + (this.totalDependencies - left) + '/' + this.totalDependencies + ')' : 'All downloads complete.');
-      },
-      noInitialRun: true
-    };
-    Module.setStatus('Downloading...');
-    window.onerror = function (event) {
-      // TODO: do not warn on ok events like simulating an infinite loop or exitStatus
-      Module.setStatus('Exception thrown, see JavaScript console');
-      Module.setStatus = function (text) {
-        if (text) Module.printErr('[post-exception status] ' + text);
-      };
-    };
+</div>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.0.0/flowbite.min.js"></script>
+  
+  <script src="js/use-pasori.js"></script>
+  <script src="js/pasori.js"></script>
+  <script src="js/members.js"></script>
+  <script src="js/status.js"></script>
+
+  <script>
+    getMembers();
   </script>
-  <script async type="text/javascript" src="pasori.js"></script>
-</body>
 
+</body>
 </html>
