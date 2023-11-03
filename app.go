@@ -1,10 +1,12 @@
 package main
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
 	"github.com/gofiber/fiber/v2"
+	"gorm.io/gorm"
 )
 
 var App *fiber.App
@@ -35,7 +37,7 @@ func InitApp() {
 		})
 	})
 
-	// API endpoint for updat member's name
+	// API endpoint for update member's name
 	App.Get("/api/update-name", func(c *fiber.Ctx) error {
 		idm := c.Queries()["idm"]
 		name := c.Queries()["name"]
@@ -86,15 +88,24 @@ func InitApp() {
 		}
 
 		var member Member
-		DB.Model(Member{IDm: idm}).First(&member)
+		res := DB.Model(Member{IDm: idm}).First(&member)
 
-		DB.Model(&member).Updates(
-			Member{
+		if errors.Is(res.Error, gorm.ErrRecordNotFound) {
+			DB.Save(&Member{
 				IDm:       idm,
+				Name:      idm,
 				Status:    status,
 				UpdatedAt: time.Now(),
-			},
-		)
+			})
+		} else {
+			DB.Model(&member).Updates(
+				Member{
+					IDm:       idm,
+					Status:    status,
+					UpdatedAt: time.Now(),
+				},
+			)
+		}
 
 		return c.Status(http.StatusOK).JSON(&fiber.Map{
 			"status":  "success",
