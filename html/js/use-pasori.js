@@ -20,6 +20,14 @@ function invokeMain() {
     } else {
         var element = document.getElementById('output');
         element.value += "NFC card reader is not ready.\n"
+
+        alertBox = document.getElementById("warning-alert");
+        console.log("aaa")
+        alertBoxBody = document.getElementById("warning-alert-body");
+        alertBoxBody.innerHTML = "カードリーダーがまだ接続されていません。"
+        alertBox.classList.remove("hidden");
+        let after = () => alertBox.classList.add("hidden");
+        window.setTimeout(after, 1500)
     }
 }
 
@@ -57,10 +65,24 @@ var Module = {
                     document.getElementById("idm").innerHTML = "カードの IDm: " + targetIdm;
                     loaded = true;
                     updateStatus();
+
+                    alertBox = document.getElementById("success-alert");
+                    alertBoxBody = document.getElementById("success-alert-body");
+                    alertBoxBody.innerHTML = "更新しました。"
+                    alertBox.classList.remove("hidden");
+                    let after = () => alertBox.classList.add("hidden");
+                    window.setTimeout(after, 1500)
                 }
             }
         } else {
-            element.value += "Nothing was returned from the reader."
+            element.value += "Nothing was returned from the reader.";
+            alertBox = document.getElementById("warning-alert");
+            alertBoxBody = document.getElementById("warning-alert-body");
+            alertBoxBody.innerHTML = "カードリーダーから何もデータが返されませんでした。ページを更新して、カードリーダーを接続し直してください。"
+            alertBox.classList.remove("hidden");
+            alertBox.classList.remove("hidden");
+            let after = () => alertBox.classList.add("hidden");
+            window.setTimeout(after, 1500)
         }
     }
     })(),
