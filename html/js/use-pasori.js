@@ -70,7 +70,7 @@ var Module = {
                     alertBoxBody = document.getElementById("success-alert-body");
                     alertBoxBody.innerHTML = "更新しました。"
                     alertBox.classList.remove("hidden");
-                    let after = () => alertBox.classList.add("hidden");
+                    let after = () => {alertBox.classList.add("hidden"); getMembers();}
                     window.setTimeout(after, 1500)
                 }
             }

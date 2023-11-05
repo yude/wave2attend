@@ -2,6 +2,8 @@ function getMembers() {
     const url = "/api/members";
     const memberArea = document.getElementById("members");
 
+    members.innerHTML = "";
+
     fetch(url)
     .then(res => res.json())
     .then(data => {
